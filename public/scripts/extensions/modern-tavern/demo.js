@@ -21,11 +21,13 @@ export class DemoBridge {
     persist() { localStorage.setItem('modern-tavern-preview', JSON.stringify(this.settings)); }
     characters() { return [...this.people, ...(this.settings.characters || [])].map(c => ({ ...c, favorite: this.settings.favorites ? this.settings.favorites.includes(c.id) : c.favorite })); }
     status() { return { connected: false, model: 'No model connected', provider: 'Interactive preview' }; }
-    async recent() { return [
-        { id: 'one', character: 'seraphina', name: 'A new adventure', text: 'So… where should we go first?', count: 1, date: 'Sample conversation' },
-        { id: 'two', character: 'narrator', name: 'The city after midnight', text: 'A folded letter waits beside the lantern.', count: 1, date: 'Sample conversation' },
-        { id: 'three', character: 'wanderer', name: 'Where the mountains end', text: 'Your journey begins here.', count: 1, date: 'Sample conversation' },
-    ]; }
+    async recent() {
+        return [
+            { id: 'one', character: 'seraphina', name: 'A new adventure', text: 'So… where should we go first?', count: 1, date: 'Sample conversation' },
+            { id: 'two', character: 'narrator', name: 'The city after midnight', text: 'A folded letter waits beside the lantern.', count: 1, date: 'Sample conversation' },
+            { id: 'three', character: 'wanderer', name: 'Where the mountains end', text: 'Your journey begins here.', count: 1, date: 'Sample conversation' },
+        ];
+    }
     async openCharacter(id) { this.selected = id; this.settings.recentCharacters = [id, ...(this.settings.recentCharacters || []).filter(x => x !== id)].slice(0, 20); this.persist(); }
     async openChat(c) { return this.openCharacter(c.character); }
     currentName() { return this.characters().find(c => c.id === this.selected)?.name || 'Chat'; }
