@@ -1,4 +1,7 @@
 /* Opt-in only: removing data-modern-view restores the upstream UI exactly. */
+html:has(body[data-modern-view]){transform:none!important;perspective:none!important;backface-visibility:visible!important}
+body[data-modern-view]{min-width:0!important;overflow:hidden!important}
+body[data-modern-view] modern-tavern{width:100%!important;height:100dvh!important;max-width:none!important;max-height:none!important}
 body[data-modern-view]{--mt-bg:#111311;--mt-text:#eef1e9;--mt-muted:#a0a698;--mt-accent:#bcf578;--mt-surface:#191c18;--mt-border:#30352b;--mt-size:16px;--mt-font:Inter,Arial,sans-serif;--mt-width:860px;--mt-avatar:44px;--mt-radius:16px;--mt-side:228px}
 body[data-modern-view] #top-settings-holder{visibility:hidden;pointer-events:none}
 body[data-modern-view=home] #sheld{visibility:hidden;pointer-events:none}
@@ -23,3 +26,5 @@ body[data-modern-view] #top-bar{visibility:hidden;pointer-events:none}
 body[data-modern-view=chat] .mes_text q{color:var(--mt-text)}
 body[data-modern-view=chat] #send_form{border-radius:var(--mt-radius)!important;background:var(--mt-surface)!important;border:1px solid var(--mt-border)!important;padding:10px!important}
 body[data-modern-view=chat] #form_sheld{border:0;background:none}
+body[data-modern-view=chat] #sheld{min-height:0!important;min-width:0!important}
+@media(max-width:760px){body[data-modern-view=chat] #sheld{bottom:calc(78px + env(safe-area-inset-bottom))!important}body[data-modern-focus=true] #sheld{bottom:max(10px,env(safe-area-inset-bottom))!important}}

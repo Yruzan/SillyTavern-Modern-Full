@@ -9,6 +9,17 @@ export class SillyTavernBridge {
         return c.extensionSettings.modern_tavern ??= {};
     }
     persist() { this.context.saveSettingsDebounced(); }
+    characterData(id) { return this.context.characters.find(c => c.avatar === id); }
+    async saveCard(id, fields) {
+        const body = id ? { avatar: id, ...fields, data: fields } : { ...fields, ch_name: fields.name };
+        const response = await fetch(id ? '/api/characters/merge-attributes' : '/api/characters/create', {
+            method: 'POST', headers: this.context.getRequestHeaders(), body: JSON.stringify(body),
+        });
+        if (!response.ok) throw new Error('Character could not be saved. Your editor remains open; please retry.');
+        const avatar = id || await response.text();
+        await this.context.getCharacters();
+        return avatar;
+    }
     characters() {
         const c = this.context;
         return c.characters.map((ch, i) => ({
