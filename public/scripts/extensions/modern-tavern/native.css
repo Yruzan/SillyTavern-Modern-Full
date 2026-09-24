@@ -1,0 +1,25 @@
+/* Opt-in only: removing data-modern-view restores the upstream UI exactly. */
+body[data-modern-view]{--mt-bg:#111311;--mt-text:#eef1e9;--mt-muted:#a0a698;--mt-accent:#bcf578;--mt-surface:#191c18;--mt-border:#30352b;--mt-size:16px;--mt-font:Inter,Arial,sans-serif;--mt-width:860px;--mt-avatar:44px;--mt-radius:16px;--mt-side:228px}
+body[data-modern-view] #top-settings-holder{visibility:hidden;pointer-events:none}
+body[data-modern-view=home] #sheld{visibility:hidden;pointer-events:none}
+body[data-modern-view=chat]{background:var(--mt-bg)!important}
+body[data-modern-view=chat] #sheld{position:fixed!important;inset:160px 24px 20px calc(var(--mt-side) + 24px)!important;max-width:none!important;width:auto!important;height:auto!important;max-height:none!important;margin:0!important;padding:0!important;background:var(--mt-bg)!important;border:0!important;box-shadow:none!important;transform:none!important;border-radius:0!important;z-index:5}
+body[data-modern-view=chat] #chat{background:var(--mt-bg)!important;max-width:var(--mt-width);width:100%;margin:auto;padding:8px 0;color:var(--mt-text);font-family:var(--mt-font);font-size:var(--mt-size)}
+body[data-modern-view=chat] .mes{background:var(--mt-message,var(--mt-surface))!important;border:1px solid var(--mt-border);border-radius:var(--mt-radius);padding:20px;margin-bottom:14px}
+body[data-modern-view=chat] .mes[is_user=true]{background:var(--mt-user,#27311f)!important}
+body[data-modern-view=chat] .mes_text{font-family:var(--mt-font);font-size:var(--mt-size);color:var(--mt-text);line-height:1.8}
+body[data-modern-view=chat] .mes_text em{color:var(--mt-muted)}
+body[data-modern-view=chat] .avatar{width:var(--mt-avatar);height:var(--mt-avatar)}
+body[data-modern-view=chat] #form_sheld{max-width:var(--mt-width);width:100%;margin:10px auto 0;background:var(--mt-surface);border:1px solid var(--mt-border);border-radius:var(--mt-radius)}
+body[data-modern-view=chat] #send_form{background:transparent!important;border:0!important}
+body[data-modern-view=chat] #send_textarea{font-family:var(--mt-font);font-size:var(--mt-size);color:var(--mt-text);background:transparent!important}
+body[data-modern-view=chat] #send_but{color:var(--mt-accent)}
+body[data-modern-collapsed=true]{--mt-side:78px}
+body[data-modern-focus=true]{--mt-side:0px}
+body[data-modern-focus=true] #sheld{top:74px!important}
+@media(max-width:1100px){body[data-modern-view]{--mt-side:200px}body[data-modern-collapsed=true]{--mt-side:78px}body[data-modern-focus=true]{--mt-side:0px}}
+@media(max-width:760px){body[data-modern-view]{--mt-side:0px}body[data-modern-view=chat] #sheld{inset:137px 10px 78px 10px!important}body[data-modern-focus=true] #sheld{inset:74px 10px 10px 10px!important}body[data-modern-view=chat] .mes{padding:14px}body[data-modern-view=chat] #chat{padding-top:10px}}
+body[data-modern-view] #top-bar{visibility:hidden;pointer-events:none}
+body[data-modern-view=chat] .mes_text q{color:var(--mt-text)}
+body[data-modern-view=chat] #send_form{border-radius:var(--mt-radius)!important;background:var(--mt-surface)!important;border:1px solid var(--mt-border)!important;padding:10px!important}
+body[data-modern-view=chat] #form_sheld{border:0;background:none}
