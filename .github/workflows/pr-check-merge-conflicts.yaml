@@ -20,6 +20,7 @@ jobs:
     steps:
       - name: Mint App Token
         id: app
+        if: ${{ vars.ST_BOT_APP_ID != '' }}
         # Create a GitHub App token
         # https://github.com/marketplace/actions/create-github-app-token
         uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
@@ -34,6 +35,6 @@ jobs:
         uses: eps1lon/actions-label-merge-conflict@1df065ebe6e3310545d4f4c4e862e43bdca146f0 # v3.0.3
         with:
           dirtyLabel: '🚫 Merge Conflicts'
-          repoToken: ${{ steps.app.outputs.token }}
+          repoToken: ${{ steps.app.outputs.token || github.token }}
           commentOnDirty: >
             ⚠️ This PR has conflicts that need to be resolved before it can be merged.

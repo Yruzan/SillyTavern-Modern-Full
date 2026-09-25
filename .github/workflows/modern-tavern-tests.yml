@@ -1,0 +1,29 @@
+name: Modern Tavern regression tests
+on:
+  push:
+    branches: [release, staging]
+    paths:
+      - 'public/scripts/extensions/modern-tavern/**'
+      - 'modern-tools/**'
+      - '.github/workflows/modern-tavern-tests.yml'
+  pull_request:
+    paths:
+      - 'public/scripts/extensions/modern-tavern/**'
+      - 'modern-tools/**'
+      - '.github/workflows/modern-tavern-tests.yml'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx eslint public/scripts/extensions/modern-tavern/app.js public/scripts/extensions/modern-tavern/bridge.js public/scripts/extensions/modern-tavern/index.js --quiet
+      - run: node --test modern-tools/bridge-regression.test.mjs
+      - run: node modern-tools/card-integration.test.mjs
