@@ -28,3 +28,6 @@ body[data-modern-view=chat] #send_form{border-radius:var(--mt-radius)!important;
 body[data-modern-view=chat] #form_sheld{border:0;background:none}
 body[data-modern-view=chat] #sheld{min-height:0!important;min-width:0!important}
 @media(max-width:760px){body[data-modern-view=chat] #sheld{bottom:calc(78px + env(safe-area-inset-bottom))!important}body[data-modern-focus=true] #sheld{bottom:max(10px,env(safe-area-inset-bottom))!important}}
+
+/* Fallback for older browsers without popover support. */
+modern-tavern[data-advanced] { position:fixed!important; inset:0!important; width:100%!important; height:100dvh!important; max-width:none!important; max-height:none!important; z-index:2147483000!important; pointer-events:none!important; }

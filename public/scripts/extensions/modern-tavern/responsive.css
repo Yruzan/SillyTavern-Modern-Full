@@ -32,3 +32,9 @@ h1,h2,h3,p,.command,.compat-item { overflow-wrap:anywhere; }
   .create-grid,.theme-presets { grid-template-columns:minmax(0,1fr); }
   .page-head { align-items:flex-start; gap:12px; }
 }
+
+/* A manual popover keeps the return control in the viewport above native drawers. */
+:host([data-advanced]) { margin:0; padding:0; border:0; background:transparent; overflow:visible; }
+.return-button { display:flex; align-items:center; gap:8px; min-height:44px; max-width:calc(100vw - 24px); left:max(12px,env(safe-area-inset-left)); bottom:max(12px,env(safe-area-inset-bottom)); }
+#character-import-status { white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:760px) { .return-button { bottom:calc(76px + env(safe-area-inset-bottom)); } }

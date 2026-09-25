@@ -8,6 +8,7 @@ export class SillyTavernBridge {
         const c = this.context;
         return c.extensionSettings.modern_tavern ??= {};
     }
+    constructor({ isGenerating = () => false } = {}) { this.isGenerating = isGenerating; }
     persist() { this.context.saveSettingsDebounced(); }
     characterData(id) { return this.context.characters.find(c => c.avatar === id); }
     async saveCard(id, fields) {
@@ -18,6 +19,30 @@ export class SillyTavernBridge {
         if (!response.ok) throw new Error('Character could not be saved. Your editor remains open; please retry.');
         const avatar = id || await response.text();
         await this.context.getCharacters();
+        return avatar;
+    }
+    async importCard(file, tagMode = 3) {
+        if (this.isGenerating()) throw new Error('Stop generation before importing characters.');
+        const format = file.name.split('.').pop().toLowerCase();
+        if (!['png', 'json', 'yaml', 'yml', 'charx', 'byaf'].includes(format)) throw new Error('Unsupported character card format.');
+        if (![2, 3, 4].includes(tagMode)) throw new Error('Choose a valid tag import option.');
+        const context = this.context;
+        const form = new FormData();
+        form.append('avatar', file);
+        form.append('file_type', format);
+        form.append('user_name', context.name1 || '');
+        const response = await fetch('/api/characters/import', {
+            method: 'POST', headers: context.getRequestHeaders({ omitContentType: true }), body: form, cache: 'no-cache',
+        });
+        if (!response.ok) throw new Error('Import failed. Check that the file is a valid character card.');
+        const data = await response.json();
+        if (data.error || typeof data.file_name !== 'string' || !data.file_name) throw new Error('SillyTavern could not read this character card.');
+        const avatar = `${data.file_name}.png`;
+        await context.getCharacters();
+        const character = this.characterData(avatar);
+        if (character && tagMode !== 2) {
+            try { await this.context.importTags(character, { importSetting: tagMode }); } catch { throw new Error('Card was imported, but library tags could not be added. Find it in Characters; do not reimport it.'); }
+        }
         return avatar;
     }
     characters() {
@@ -76,7 +101,8 @@ export class SillyTavernBridge {
     unsubscribe() { for (const [type, fn] of this.listeners) this.context.eventSource.removeListener(type, fn); }
     advanced(section) {
         const drawers = { Characters: '#rightNavHolder', 'World Info': '#WI-SP-button', Personas: '#persona-management-button', Presets: '#ai-config-button', Extensions: '#extensions-settings-button', Connections: '#sys-settings-button', Settings: '#user-settings-button', 'Prompt Studio': '#advanced-formatting-button', Library: '#extensions-settings-button' };
-        const holder = document.querySelector(drawers[section] || '');
+        if (!drawers[section]) return;
+        const holder = document.querySelector(drawers[section]);
         const icon = holder?.querySelector('.drawer-icon');
         if (icon?.classList.contains('closedIcon')) icon.click();
     }
