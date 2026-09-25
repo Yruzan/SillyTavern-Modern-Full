@@ -26,7 +26,7 @@ try {
     const headers = { 'Content-Type': 'application/json', Cookie: cookie, 'X-CSRF-Token': token };
     globalThis.fetch = (url, options) => originalFetch(base + url, options);
     let refreshed = 0;
-    globalThis.window = { SillyTavern: { getContext: () => ({ getRequestHeaders: () => headers, getCharacters: async () => refreshed++ }) } };
+    globalThis.window = { SillyTavern: { getContext: () => ({ getRequestHeaders: (options) => options?.omitContentType ? { Cookie: cookie, 'X-CSRF-Token': token } : headers, characters: [], getCharacters: async () => refreshed++ }) } };
     const bridge = new SillyTavernBridge();
     const avatar = await bridge.saveCard(null, { name: 'Modern integration test', description: 'Before', first_mes: 'Hello', alternate_greetings: ['One', 'Two'] });
     const post = async (route, body) => {
@@ -43,7 +43,32 @@ try {
     assert.equal(saved.data.extensions.modern_test_unknown.value, 'preserve');
     assert.deepEqual(saved.data.alternate_greetings, []);
     assert.equal(refreshed, 2);
-    console.log('PASS: real API create/edit/readback, cleared greetings, preserved unrelated fields; CSRF enabled.');
+    const sourceCard = {
+        spec: 'chara_card_v2', spec_version: '2.0', data: {
+            name: 'Imported character', description: 'Imported description', personality: 'Curious',
+            scenario: 'A library', first_mes: 'Welcome', mes_example: '', creator_notes: 'Keep this note',
+            system_prompt: '', post_history_instructions: '', alternate_greetings: ['Another greeting'],
+            tags: ['Fantasy'], creator: 'Test author', character_version: '1.2',
+            extensions: { untouched: { nested: ['data'] } },
+            character_book: { name: 'Embedded lore', entries: [] },
+        },
+    };
+    const jsonAvatar = await bridge.importCard(new File([JSON.stringify(sourceCard)], 'card.JSON'), 2);
+    const importedCard = await (await post('/api/characters/get', { avatar_url: jsonAvatar })).json();
+    assert.equal(importedCard.data.creator_notes, 'Keep this note');
+    assert.deepEqual(importedCard.data.extensions.untouched, sourceCard.data.extensions.untouched);
+    assert.equal(importedCard.data.character_book.name, 'Embedded lore');
+    assert.deepEqual(importedCard.data.alternate_greetings, ['Another greeting']);
+    const png = await (await post('/api/characters/export', { avatar_url: jsonAvatar, format: 'png' })).arrayBuffer();
+    const pngAvatar = await bridge.importCard(new File([png], 'card.png', { type: 'image/png' }), 2);
+    assert.notEqual(jsonAvatar, pngAvatar, 'Import must not overwrite an existing character');
+    const pngCard = await (await post('/api/characters/get', { avatar_url: pngAvatar })).json();
+    assert.deepEqual(pngCard.data.extensions.untouched, sourceCard.data.extensions.untouched);
+    await assert.rejects(() => bridge.importCard(new File(['not json'], 'broken.json'), 2), /Import failed|could not read/);
+    await assert.rejects(() => bridge.importCard(new File([''], 'wrong.exe'), 2), /Unsupported/);
+    const busyBridge = new SillyTavernBridge({ isGenerating: () => true });
+    await assert.rejects(() => busyBridge.importCard(new File(['{}'], 'card.json'), 2), /Stop generation/);
+    console.log('PASS: native create/edit, JSON and PNG import, duplicate-safe names, embedded lore and metadata, malformed files, generation guard; CSRF enabled.');
 } finally {
     globalThis.fetch = originalFetch;
     server.kill('SIGTERM');
